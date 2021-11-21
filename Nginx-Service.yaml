@@ -22,3 +22,68 @@ service/nginx-service created
 NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)        AGE
 kubernetes   ClusterIP   10.96.0.1      <none>        443/TCP        16m
 nginx-service   NodePort    10.98.188.13   <none>        80:30007/TCP   52s
+
+-----------------------
+
+[root@ip-172-31-83-19 ~]# cat nginx-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-deploy
+  template:
+    metadata:
+      labels:
+        app: nginx-deploy
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+
+[root@ip-172-31-83-19 ~]# cat nginx-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  type: NodePort
+  selector:
+    app: nginx-deploy
+  ports:
+      # By default and for convenience, the `targetPort` is set to the same value as the `port` field.
+    - port: 80
+      targetPort: 80
+      # Optional field
+      # By default and for convenience, the Kubernetes control plane will allocate a port from a range (default: 30000-32767)
+      nodePort: 30007
+
+In service.yaml app: nginx-deploy has to be matched with metadata:
+  name: nginx-deployment or labels: app: nginx
+  
+--------------
+To check version or documentation of any object or workload
+
+[root@ip-172-31-83-19 ~]# kubectl explain pod
+KIND:     Pod
+VERSION:  v1
+
+DESCRIPTION:
+     Pod is a collection of containers that can run on a host. This resource is
+     created by clients and scheduled onto hosts.
+
+##how to connect to container 
+
+kubectl exec -it springboot-deployment-757cbf8cc5-285nj bash
+
+##how to check pod logs
+kubectl logs springboot-deployment-757cbf8cc5-285nj
+
