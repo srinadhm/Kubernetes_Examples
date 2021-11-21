@@ -1,0 +1,49 @@
+[root@ip-172-31-83-19 ~]# cat springboot-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-deployment
+  labels:
+    app: springboot
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: springboot
+  template:
+    metadata:
+      labels:
+        app: springboot
+    spec:
+      containers:
+      - name: springboot
+        image: cloudtechmasters/springboohello-cicd:latest
+        ports:
+        - containerPort: 8080
+
+kubectl get deploy or kubectl get deployment
+NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
+springboot-deployment   3/3     3            3           19m
+
+kubectl get pods or kubectl get po
+
+NAME                                     READY   STATUS    RESTARTS   AGE
+springboot-deployment-55f7547cb8-jd5bb   1/1     Running   0          3m34s
+springboot-deployment-55f7547cb8-kk6t6   1/1     Running   0          3m32s
+springboot-deployment-55f7547cb8-sqrjd   1/1     Running   0          3m29s
+
+kubectl exec -it springboot-deployment-757cbf8cc5-285nj bash
+
+or 
+
+kubectl logs springboot-deployment-757cbf8cc5-285nj
+ 
+##how to debug the pod when we run apply command
+
+kubectl get pods --watch
+
+##how to see the documentation or version of k8s object
+
+[root@ip-172-31-83-19 ~]# kubectl explain pod
+KIND:     Pod
+VERSION:  v1
