@@ -20,6 +20,11 @@ spec:
         ports:
         - containerPort: 80
 
+Note: spec --- selector --- matchLabels --- app: nginx 
+      spec --- template --- metadata --- labels -- app: nginx 
+      
+names has to be matched
+
 
 [root@ip-172-31-83-19 ~]# kubectl create -f nginx-deployment.yaml
 deployment.apps/nginx-deployment created
