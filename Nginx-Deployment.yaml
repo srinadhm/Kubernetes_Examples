@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+
+[root@ip-172-31-83-19 ~]# kubectl create -f nginx-deployment.yaml
+deployment.apps/nginx-deployment created
+[root@ip-172-31-83-19 ~]# kubectl get deployments
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   3/3     3            3           13s
+[root@ip-172-31-83-19 ~]# kubectl get pods
+NAME                                READY   STATUS    RESTARTS   AGE
+nginx-deployment-66b6c48dd5-8hwml   1/1     Running   0          19s
+nginx-deployment-66b6c48dd5-ltwcc   1/1     Running   0          19s
+nginx-deployment-66b6c48dd5-xppd2   1/1     Running   0          19s
+[root@ip-172-31-83-19 ~]#
+
+##Connect to a container with shell
+
+kubectl exec --stdin --tty nginx-deployment-66b6c48dd5-8hwml -- /bin/bash
+
+##Connect to a container if more than one container we have 
+
+kubectl exec -i -t nginx-deployment-66b6c48dd5-8hwml --container nginx -- /bin/bash
