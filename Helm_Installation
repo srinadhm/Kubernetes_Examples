@@ -1,0 +1,31 @@
+curl -sSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
+helm version --short
+
+Helm will be installed in the below location 
+
+/usr/local/bin/helm
+
+
+minikube also installed in the below location 
+ 
+/usr/local/bin/minikube
+
+or 
+
+Download location : https://github.com/helm/helm/releases
+
+1.Download your desired release using wget command 
+
+wget https://get.helm.sh/helm-v3.7.1-linux-amd64.tar.gz
+
+2.Extract using tar command 
+
+tar -xzvf helm-v3.7.1-linux-amd64.tar.gz
+
+3.Find the helm binary in the unpacked directory, and move it to its desired destination
+
+mv linux-amd64/helm /usr/local/bin/helm
+
+
+
