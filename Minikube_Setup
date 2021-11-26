@@ -17,6 +17,44 @@ export PATH=/usr/local/bin:$PATH
 minikube start --driver=none
 minikube version --short
 
+[root@ip-172-31-85-112 ~]# export PATH=/usr/local/bin:$PATH
+[root@ip-172-31-85-112 ~]# minikube start --driver=none
+* minikube v1.24.0 on Amazon 2 (xen/amd64)
+* Using the none driver based on user configuration
+* Starting control plane node minikube in cluster minikube
+* Running on localhost (CPUs=2, Memory=3921MB, Disk=8179MB) ...
+* OS release is Amazon Linux 2
+    > kubeadm.sha256: 64 B / 64 B [--------------------------] 100.00% ? p/s 0s
+    > kubectl.sha256: 64 B / 64 B [--------------------------] 100.00% ? p/s 0s
+    > kubelet: 115.57 MiB / 115.57 MiB [-----------] 100.00% 74.29 MiB p/s 1.8s
+  - Generating certificates and keys ...
+  - Booting up control plane ...
+  - Configuring RBAC rules ...
+* Configuring local host environment ...
+*
+! The 'none' driver is designed for experts who need to integrate with an existing VM
+* Most users should use the newer 'docker' driver instead, which does not require root!
+* For more information, see: https://minikube.sigs.k8s.io/docs/reference/drivers/none/
+*
+! kubectl and minikube configuration will be stored in /root
+! To use kubectl or minikube commands as your own user, you may need to relocate them. For example, to overwrite your own settings, run:
+*
+  - sudo mv /root/.kube /root/.minikube $HOME
+  - sudo chown -R $USER $HOME/.kube $HOME/.minikube
+*
+* This can also be done automatically by setting the env var CHANGE_MINIKUBE_NONE_USER=true
+* Verifying Kubernetes components...
+  - Using image gcr.io/k8s-minikube/storage-provisioner:v5
+* Enabled addons: default-storageclass, storage-provisioner
+
+! /root/bin/kubectl is version 1.20.4-eks-6b7464, which may have incompatibilites with Kubernetes 1.22.3.
+  - Want kubectl v1.22.3? Try 'minikube kubectl -- get pods -A'
+* Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
+[root@ip-172-31-85-112 ~]# minikube version --short
+v1.24.0
+
+
+
 3.To interact with Kubernetes cluster install kubectl (kube client)
 
 curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.20.4/2021-04-12/bin/linux/amd64/kubectl
@@ -37,7 +75,15 @@ echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
 source $HOME/.bashrc
 kubectl version --short --client
 
-Once minikube and kubectl is installed, minikube setup is done
+
+Once minikube and kubectl is installed, check the nodes for minikube we have only one master acts as node 
+
+[root@ip-172-31-85-112 ~]# kubectl get nodes
+NAME                            STATUS   ROLES                  AGE   VERSION
+ip-172-31-85-112.ec2.internal   Ready    control-plane,master   76s   v1.22.3
+
+
+minikube setup is done
 
 ------------------------------------------------------------------
 
