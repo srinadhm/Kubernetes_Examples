@@ -82,6 +82,9 @@ Once minikube and kubectl is installed, check the nodes for minikube we have onl
 NAME                            STATUS   ROLES                  AGE   VERSION
 ip-172-31-85-112.ec2.internal   Ready    control-plane,master   76s   v1.22.3
 
+minikube also installed in the below location 
+ 
+/usr/local/bin/minikube
 
 minikube setup is done
 
