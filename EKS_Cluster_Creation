@@ -1,0 +1,378 @@
+EKS Cluster Creation
+##########################
+1.Create Ec2 instance of type t2.xlarge
+2.Create a IAM role or IAM user with Admin access and attach it to ec2 instance
+3.To connect to k8s cluster we need k8s client config file , we need to install kubectl eks 
+curl -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.14.6/2019-08-22/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+mkdir -p $HOME/bin
+cp ./kubectl $HOME/bin/kubectl
+export PATH=$HOME/bin:$PATH
+echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
+source $HOME/.bashrc
+kubectl version --short --client
+
+
+4.To create eks cluster we need to create via Eks client by weaveworks 
+
+eksctl is a simple CLI tool for creating and managing clusters on EKS - Amazon's managed Kubernetes service for EC2. It is written in Go, uses CloudFormation, was created by Weaveworks and it welcomes contributions from the community.
+
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/bin
+eksctl version
+
+5.Cluster creation
+
+eksctl create cluster --name=ekscluster \
+                  --region=us-east-1 \
+                  --zones=us-east-1a,us-east-1b,us-east-1c,us-east-1d \
+                  --without-nodegroup 
+				  
+eksctl-ekscluster-cluster
+
+
+				  
+create cluster without nodes 
+
+
+--name=eksdemo (cluster name )
+--region=us-east-1 (region)
+--zones=us-east-1a,us-east-1b,us-east-1c,us-east-1d
+
+eksctl internally calls/uses cloudformation template to create cluster and we need to wait until the cluster has created we are not supposed to create node group or nodes until status becomes 'CREATE_COMPLETE' in cloud formation stack finally we can see cluster in EKS Clusters section.
+
+[root@ip-172-31-91-88 ~]# eksctl create cluster --name=ekscluster \
+>                   --region=us-east-1 \
+>                   --zones=us-east-1a,us-east-1b,us-east-1c,us-east-1d \
+>                   --without-nodegroup
+2021-11-30 13:39:31 [ℹ]  eksctl version 0.75.0
+2021-11-30 13:39:31 [ℹ]  using region us-east-1
+2021-11-30 13:39:31 [ℹ]  subnets for us-east-1a - public:192.168.0.0/19 private:192.168.128.0/19
+2021-11-30 13:39:31 [ℹ]  subnets for us-east-1b - public:192.168.32.0/19 private:192.168.160.0/19
+2021-11-30 13:39:31 [ℹ]  subnets for us-east-1c - public:192.168.64.0/19 private:192.168.192.0/19
+2021-11-30 13:39:31 [ℹ]  subnets for us-east-1d - public:192.168.96.0/19 private:192.168.224.0/19
+2021-11-30 13:39:31 [ℹ]  using Kubernetes version 1.21
+2021-11-30 13:39:31 [ℹ]  creating EKS cluster "ekscluster" in "us-east-1" region with
+2021-11-30 13:39:31 [ℹ]  if you encounter any issues, check CloudFormation console or try 'eksctl utils describe-stacks --region=us-east-1 --cluster=ekscluster'
+2021-11-30 13:39:31 [ℹ]  CloudWatch logging will not be enabled for cluster "ekscluster" in "us-east-1"
+2021-11-30 13:39:31 [ℹ]  you can enable it with 'eksctl utils update-cluster-logging --enable-types={SPECIFY-YOUR-LOG-TYPES-HERE (e.g. all)} --region=us-east-1 --cluster=ekscluster'
+2021-11-30 13:39:31 [ℹ]  Kubernetes API endpoint access will use default of {publicAccess=true, privateAccess=false} for cluster "ekscluster" in "us-east-1"
+2021-11-30 13:39:31 [ℹ]
+2 sequential tasks: { create cluster control plane "ekscluster", wait for control plane to become ready
+}
+2021-11-30 13:39:31 [ℹ]  building cluster stack "eksctl-ekscluster-cluster"
+2021-11-30 13:39:31 [ℹ]  deploying stack "eksctl-ekscluster-cluster"
+2021-11-30 13:40:01 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:40:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:41:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:42:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:43:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:44:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:45:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:46:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:47:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:48:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:49:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:50:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:51:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:52:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-cluster"
+2021-11-30 13:54:48 [ℹ]  waiting for the control plane availability...
+2021-11-30 13:54:48 [✔]  saved kubeconfig as "/root/.kube/config"
+2021-11-30 13:54:48 [ℹ]  no tasks
+2021-11-30 13:54:48 [✔]  all EKS cluster resources for "ekscluster" have been created
+2021-11-30 13:54:50 [ℹ]  kubectl command should work with "/root/.kube/config", try 'kubectl get nodes'
+2021-11-30 13:54:50 [✔]  EKS cluster "ekscluster" in "us-east-1" region is ready
+
+[root@ip-172-31-91-88 ~]# cat /root/.kube/config
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM1ekNDQWMrZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeE1URXpNREV6TkRjME5Wb1hEVE14TVRFeU9ERXpORGMwTlZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBT3FwCmZoZkpIN3YydXBYeE5ISFpVKzVRYUFrVG1Feit1Z2VhMHVkMVZRa0dlelVtUGxMdkRqVFJmeEdid0xhUDh4WDcKNURGWjJZY1RScmFjMUhMOEJ1MlEwSzNRWTZDdkp5TVFoa0pkUUl6VGI0RjZQODZyUjU3b3RQTzhvOTkzZnlYRAovZzBpaHVaRElLd1YwMVZLWWFqbFVZZVVxKzRIc0tQdVhQQUdnZDlUcVp3TFRlbkpseHc1aEdLTGRkbHRZU2pNCmpOUm5oWFYySnMwQVlsaU1QSkhUekdtWDBWbVdXMS9BcGNkbzVqd0l2TVNISjhDYndGYm1CQXRKK3dnZzloREkKY1czWTFyaW1xU0NMVkRtZjJTdzJ3MDlMTEpxeXY5WFVaZGxkdHFMdkJZQzgzc0NrMlRMMDhLMkY3V2kwMGFTaQpSRSsrb2FyVlZxSHovN1JMM2M4Q0F3RUFBYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZEenZpeGpRQ28xY2EydEFiVTJoSytVcHNpanNNQTBHQ1NxR1NJYjMKRFFFQkN3VUFBNElCQVFCQW10aVNselZGS1Rsdmh6MEw0WTJQUERqandIbWRzUjBzYnFSMTA3L1AwZU9wY0NsdwpqL2ZpclQvL0trMmY2V2dLMlBWZUxUVGs2MEhhblZyajhuVndLTWI3N3REY0dDcW9qT1FBQWRlZi9hYjFQKzJaCnJtc09RbnU1c0E0WnRHbE5kdFMzOWtqN3ZqRG1Ud2t3MWJFaGRqeWQrWnE4SkhrQ3l5QmNsanZsUFlaa3VkQ1IKUUlPQjVGVU1HM3NYMThDQVNmekZraE1YQUNROTlPSzRuNVFncTM2ZSt5VmtTbXhLNHBzelF4NlBoOS9qK3BKOApMSFpkN3ROQnRLQm5rTG04L01wWnV2UlN2cGVScUh2N3ZHUExQcVBQR1RhVGlCK0l6bTRZaE9nNUpLRisxd2t0Cm1hbTR2YnRaQ2RGcUp1NzVaWENmRko0UXA1RWJQZXhlaWpmbAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+    server: https://9523B1B71475700BCB946BDDF3449D5E.gr7.us-east-1.eks.amazonaws.com
+  name: ekscluster.us-east-1.eksctl.io
+contexts:
+- context:
+    cluster: ekscluster.us-east-1.eksctl.io
+    user: i-089852e70a73ae1c7@ekscluster.us-east-1.eksctl.io
+  name: i-089852e70a73ae1c7@ekscluster.us-east-1.eksctl.io
+current-context: i-089852e70a73ae1c7@ekscluster.us-east-1.eksctl.io
+kind: Config
+preferences: {}
+users:
+- name: i-089852e70a73ae1c7@ekscluster.us-east-1.eksctl.io
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1alpha1
+      args:
+      - eks
+      - get-token
+      - --cluster-name
+      - ekscluster
+      - --region
+      - us-east-1
+      command: aws
+      env:
+      - name: AWS_STS_REGIONAL_ENDPOINTS
+        value: regional
+      provideClusterInfo: false
+
+
+
+6.Create node-group (nodes )
+
+eksctl create nodegroup --cluster=ekscluster \
+                   --region=us-east-1 \
+                   --name=ekscluster-node \
+                   --node-type=t2.medium \
+                   --nodes=4 \
+                   --nodes-min=4 \
+                   --nodes-max=5 \
+                   --node-volume-size=10 \
+                   --ssh-access \
+                   --ssh-public-key=aws-devops \
+                   --managed \
+                   --asg-access \
+                   --external-dns-access \
+                   --full-ecr-access \
+                   --appmesh-access \
+                   --alb-ingress-access	
+
+--name=ekscluster-node
+
+eksctl-ekscluster-nodegroup-ekscluster-node
+
+
+[root@ip-172-31-91-88 ~]# eksctl create nodegroup --cluster=ekscluster \
+>                    --region=us-east-1 \
+>                    --name=ekscluster-node \
+>                    --node-type=t2.medium \
+>                    --nodes=4 \
+>                    --nodes-min=4 \
+>                    --nodes-max=5 \
+>                    --node-volume-size=10 \
+>                    --ssh-access \
+>                    --ssh-public-key=aws-devops \
+>                    --managed \
+>                    --asg-access \
+>                    --external-dns-access \
+>                    --full-ecr-access \
+>                    --appmesh-access \
+>                    --alb-ingress-access
+2021-11-30 13:59:22 [ℹ]  eksctl version 0.75.0
+2021-11-30 13:59:22 [ℹ]  using region us-east-1
+2021-11-30 13:59:22 [ℹ]  will use version 1.21 for new nodegroup(s) based on control plane version
+2021-11-30 13:59:23 [ℹ]  nodegroup "ekscluster-node" will use "" [AmazonLinux2/1.21]
+2021-11-30 13:59:23 [ℹ]  using EC2 key pair %!q(*string=<nil>)
+2021-11-30 13:59:23 [ℹ]  1 nodegroup (ekscluster-node) was included (based on the include/exclude rules)
+2021-11-30 13:59:23 [ℹ]  will create a CloudFormation stack for each of 1 managed nodegroups in cluster "ekscluster"
+2021-11-30 13:59:23 [ℹ]
+2 sequential tasks: { fix cluster compatibility, 1 task: { 1 task: { create managed nodegroup "ekscluster-node" } }
+}
+2021-11-30 13:59:23 [ℹ]  checking cluster stack for missing resources
+2021-11-30 13:59:23 [ℹ]  cluster stack has all required resources
+2021-11-30 13:59:23 [ℹ]  building managed nodegroup stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 13:59:24 [ℹ]  deploying stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 13:59:24 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 13:59:40 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 13:59:57 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:00:17 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:00:33 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:00:53 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:01:13 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:01:32 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:01:48 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:02:06 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:02:23 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:02:39 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:02:57 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:03:13 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:03:29 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:03:47 [ℹ]  waiting for CloudFormation stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 14:03:47 [ℹ]  no tasks
+2021-11-30 14:03:47 [✔]  created 0 nodegroup(s) in cluster "ekscluster"
+2021-11-30 14:03:47 [ℹ]  nodegroup "ekscluster-node" has 4 node(s)
+2021-11-30 14:03:47 [ℹ]  node "ip-192-168-119-66.ec2.internal" is ready
+2021-11-30 14:03:47 [ℹ]  node "ip-192-168-25-179.ec2.internal" is ready
+2021-11-30 14:03:47 [ℹ]  node "ip-192-168-47-92.ec2.internal" is ready
+2021-11-30 14:03:47 [ℹ]  node "ip-192-168-91-149.ec2.internal" is ready
+2021-11-30 14:03:47 [ℹ]  waiting for at least 4 node(s) to become ready in "ekscluster-node"
+2021-11-30 14:03:47 [ℹ]  nodegroup "ekscluster-node" has 4 node(s)
+2021-11-30 14:03:47 [ℹ]  node "ip-192-168-119-66.ec2.internal" is ready
+2021-11-30 14:03:47 [ℹ]  node "ip-192-168-25-179.ec2.internal" is ready
+2021-11-30 14:03:47 [ℹ]  node "ip-192-168-47-92.ec2.internal" is ready
+2021-11-30 14:03:47 [ℹ]  node "ip-192-168-91-149.ec2.internal" is ready
+2021-11-30 14:03:47 [✔]  created 1 managed nodegroup(s) in cluster "ekscluster"
+2021-11-30 14:03:47 [ℹ]  checking security group configuration for all nodegroups
+2021-11-30 14:03:47 [ℹ]  all nodegroups have up-to-date cloudformation templates
+
+Once the node group stack is completed we can see the nodes (4 ec2 machines are created in EC2 Dashboard
+
+
+kubectl get nodes
+NAME                             STATUS   ROLES    AGE     VERSION
+ip-192-168-119-66.ec2.internal   Ready    <none>   6m27s   v1.21.5-eks-bc4871b
+ip-192-168-25-179.ec2.internal   Ready    <none>   5m59s   v1.21.5-eks-bc4871b
+ip-192-168-47-92.ec2.internal    Ready    <none>   6m22s   v1.21.5-eks-bc4871b
+ip-192-168-91-149.ec2.internal   Ready    <none>   5m54s   v1.21.5-eks-bc4871b
+
+7.To delete cluster first we need to remove node groups once those are deleted then we can delete cluster 
+
+eksctl delete nodegroup --cluster=ekscluster \
+                   --region=us-east-1 \
+	          			   --name=ekscluster-node
+						   
+2021-11-30 15:04:02 [ℹ]  eksctl version 0.75.0
+2021-11-30 15:04:02 [ℹ]  using region us-east-1
+2021-11-30 15:04:03 [ℹ]  1 nodegroup (ekscluster-node) was included (based on the include/exclude rules)
+2021-11-30 15:04:03 [ℹ]  will drain 1 nodegroup(s) in cluster "ekscluster"
+2021-11-30 15:04:03 [ℹ]  cordon node "ip-192-168-119-66.ec2.internal"
+2021-11-30 15:04:03 [ℹ]  cordon node "ip-192-168-25-179.ec2.internal"
+2021-11-30 15:04:03 [ℹ]  cordon node "ip-192-168-47-92.ec2.internal"
+2021-11-30 15:04:03 [ℹ]  cordon node "ip-192-168-91-149.ec2.internal"
+2021-11-30 15:04:03 [!]  ignoring DaemonSet-managed Pods: kube-system/aws-node-pqw2d, kube-system/kube-proxy-5c4xv
+2021-11-30 15:04:03 [!]  ignoring DaemonSet-managed Pods: kube-system/aws-node-p7bg7, kube-system/kube-proxy-m6sth
+2021-11-30 15:04:03 [!]  ignoring DaemonSet-managed Pods: kube-system/aws-node-2zlxx, kube-system/kube-proxy-ncfwh
+2021-11-30 15:04:03 [!]  ignoring DaemonSet-managed Pods: kube-system/aws-node-72992, kube-system/kube-proxy-g4fqm
+2021-11-30 15:04:03 [!]  ignoring DaemonSet-managed Pods: kube-system/aws-node-pqw2d, kube-system/kube-proxy-5c4xv
+2021-11-30 15:04:03 [!]  ignoring DaemonSet-managed Pods: kube-system/aws-node-pqw2d, kube-system/kube-proxy-5c4xv
+2021-11-30 15:04:04 [!]  ignoring DaemonSet-managed Pods: kube-system/aws-node-pqw2d, kube-system/kube-proxy-5c4xv
+2021-11-30 15:04:04 [!]  ignoring DaemonSet-managed Pods: kube-system/aws-node-pqw2d, kube-system/kube-proxy-5c4xv
+2021-11-30 15:04:04 [✔]  drained all nodes: [ip-192-168-119-66.ec2.internal ip-192-168-25-179.ec2.internal ip-192-168-47-92.ec2.internal ip-192-168-91-149.ec2.internal]
+2021-11-30 15:04:04 [ℹ]  will delete 1 nodegroups from cluster "ekscluster"
+2021-11-30 15:04:05 [ℹ]  1 task: { 1 task: { delete nodegroup "ekscluster-node" [async] } }
+2021-11-30 15:04:05 [ℹ]  will delete stack "eksctl-ekscluster-nodegroup-ekscluster-node"
+2021-11-30 15:04:05 [ℹ]  will delete 0 nodegroups from auth ConfigMap in cluster "ekscluster"
+2021-11-30 15:04:05 [✔]  deleted 1 nodegroup(s) from cluster "ekscluster"
+
+Cloud formation stack template will start removing the node group
+
+8.Once the nodes are deleted all the instances will be terminated , then we can remove the cluster 
+
+eksctl delete cluster --name=ekscluster \
+                  --region=us-east-1	
+>                   --region=us-east-1
+2021-11-30 15:07:48 [ℹ]  eksctl version 0.75.0
+2021-11-30 15:07:48 [ℹ]  using region us-east-1
+2021-11-30 15:07:48 [ℹ]  deleting EKS cluster "ekscluster"
+2021-11-30 15:07:49 [ℹ]  deleted 0 Fargate profile(s)
+2021-11-30 15:07:49 [✔]  kubeconfig has been updated
+2021-11-30 15:07:49 [ℹ]  cleaning up AWS load balancers created by Kubernetes objects of Kind Service or Ingress
+2021-11-30 15:07:49 [ℹ]  1 task: { delete cluster control plane "ekscluster" [async] }
+2021-11-30 15:07:49 [ℹ]  will delete stack "eksctl-ekscluster-cluster"
+2021-11-30 15:07:49 [✔]  all cluster resources were deleted
+
+Cluster stack template will be deleted in Cloud Formation and Finally cluster will be deleted in EKS.
+
+
+
+##########
+
+To update a kubeconfig for your cluster
+
+aws eks update-kubeconfig --name ekscluster 
+
+
+
+#################################
+helm install elasticsearch elasticsearch chartname foldername
+
+[root@ip-172-31-91-88 ELK_helm_charts]# helm install elasticsearch elasticsearch
+
+
+W1130 14:18:41.970760   32643 warnings.go:70] policy/v1beta1 PodDisruptionBudget is deprecated in v1.21+, unavailable in v1.25+; use policy/v1 PodDisruptionBudget
+W1130 14:18:42.059786   32643 warnings.go:70] policy/v1beta1 PodDisruptionBudget is deprecated in v1.21+, unavailable in v1.25+; use policy/v1 PodDisruptionBudget
+NAME: elasticsearch
+LAST DEPLOYED: Tue Nov 30 14:18:41 2021
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+NOTES:
+1. Watch all cluster members come up.
+  $ kubectl get pods --namespace=default -l app=elasticsearch-master -w
+2. Test cluster health using Helm test.
+  $ helm test elasticsearch --cleanup
+  
+[root@ip-172-31-91-88 ELK_helm_charts]# kubectl get pods
+NAME                            READY   STATUS    RESTARTS   AGE
+elasticsearch-master-0          1/1     Running   0          34m
+elasticsearch-master-1          1/1     Running   0          34m
+elasticsearch-master-2          1/1     Running   0          34m
+filebeat-filebeat-cgttn         1/1     Running   0          72s
+filebeat-filebeat-gvgrl         1/1     Running   0          72s
+filebeat-filebeat-kndnt         1/1     Running   0          72s
+filebeat-filebeat-zt58f         1/1     Running   0          72s
+kibana-kibana-d684b6c46-4ns5v   1/1     Running   0          6m34s
+[root@ip-172-31-91-88 ELK_helm_charts]# helm list
+NAME            NAMESPACE       REVISION        UPDATED                                 STATUS          CHART                   APP VERSION
+elasticsearch   default         1               2021-11-30 14:18:41.741654148 +0000 UTC deployed        elasticsearch-7.6.2     7.6.2
+filebeat        default         1               2021-11-30 14:52:08.957240829 +0000 UTC deployed        filebeat-7.6.2          7.6.2
+kibana          default         1               2021-11-30 14:46:47.2205157 +0000 UTC   deployed        kibana-7.6.2            7.6.2
+
+[root@ip-172-31-91-88 ELK_helm_charts]# helm list
+NAME            NAMESPACE       REVISION        UPDATED                                 STATUS          CHART                   APP VERSION
+elasticsearch   default         1               2021-11-30 14:18:41.741654148 +0000 UTC deployed        elasticsearch-7.6.2     7.6.2
+filebeat        default         1               2021-11-30 14:52:08.957240829 +0000 UTC deployed        filebeat-7.6.2          7.6.2
+kibana          default         1               2021-11-30 14:46:47.2205157 +0000 UTC   deployed        kibana-7.6.2            7.6.2
+[root@ip-172-31-91-88 ELK_helm_charts]# helm delete elasticsearch filebeat  kibana
+W1130 14:57:49.156367     526 warnings.go:70] policy/v1beta1 PodDisruptionBudget is deprecated in v1.21+, unavailable in v1.25+; use policy/v1 PodDisruptionBudget
+release "elasticsearch" uninstalled
+W1130 14:57:49.277211     526 warnings.go:70] rbac.authorization.k8s.io/v1beta1 ClusterRoleBinding is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 ClusterRoleBinding
+W1130 14:57:49.299949     526 warnings.go:70] rbac.authorization.k8s.io/v1beta1 ClusterRole is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 ClusterRole
+release "filebeat" uninstalled
+release "kibana" uninstalled
+[root@ip-172-31-91-88 ELK_helm_charts]# helm list
+NAME    NAMESPACE       REVISION        UPDATED STATUS  CHART   APP VERSION
+
+
+   1  curl -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.14.6/2019-08-22/bin/linux/amd64/kubectl
+    2  chmod +x ./kubectl
+    3  mkdir -p $HOME/bin
+    4  cp ./kubectl $HOME/bin/kubectl
+    5  export PATH=$HOME/bin:$PATH
+    6  echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
+    7  source $HOME/.bashrc
+    8  kubectl version --short --client
+    9  curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+   10  sudo mv /tmp/eksctl /usr/bin
+   11  eksctl version
+   12  eksctl create cluster --name=ekscluster                   --region=us-east-1                   --zones=us-east-1a,us-east-1b,us-east-1c,us-east-1d                   --without-nodegroup
+   13  kubectl get nodes
+   14  cd /root/.kube/config
+   15  cat /root/.kube/config
+   16  eksctl create nodegroup --cluster=ekscluster                    --region=us-east-1                    --name=ekscluster-node                    --node-type=t2.medium                    --nodes=4                    --nodes-min=4                    --nodes-max=5                    --node-volume-size=10                    --ssh-access                    --ssh-public-key=aws-devops                    --managed                    --asg-access                    --external-dns-access                    --full-ecr-access                    --appmesh-access                    --alb-ingress-access
+   17  clear
+   18  kubectl get nodes
+   19  clear
+   20  kubectl get nodes
+   21  curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+   22  ll
+   23  chmod 700 get_helm.sh
+   24  ll
+   25  vi get_helm.sh
+   26  ./get_helm.sh
+   27  helm version
+   28  yum install git -y
+   29  git clone https://github.com/srinadhm/helm_charts.git
+   30  clear
+   31  ll
+   32  cd helm_charts
+   33  ll
+   34  cd ELK_helm_charts
+   35  ll
+   36  kubectl get pods
+   37  clear
+   38  helm install elasticsearch elasticsearch
+   39  kubectl get pods
+   40  kubectl logs elasticsearch-master-0
+   41  clear
+   42  helm install kibana kibana
+   43  kubectl get pods
+   44  kubectl get pods --watch
+   45  kubectl get pods
+   46  helm install filebeat filebeat
+   47  kubectl get pods
+   48  helm list
+   49  clear
+   50  helm list
+   51  helm delete elasticsearch filebeat  kibana
+   52  helm list
