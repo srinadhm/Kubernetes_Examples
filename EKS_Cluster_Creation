@@ -271,7 +271,13 @@ To update a kubeconfig for your cluster
 
 aws eks update-kubeconfig --name ekscluster 
 
+If we dont have kubeconfig file in local if we have permissions to the aws region and cluster we can directly update kubeconfig file by using cluster and region 
 
+aws eks update-kubeconfig --name ekscluster --region us-east-1 
+
+to view the pods in particular namespace 
+
+kubectl get pods -n default  
 
 #################################
 helm install elasticsearch elasticsearch chartname foldername
